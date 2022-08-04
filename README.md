@@ -1,0 +1,1 @@
+# Ansible_Role_for_setup_k8s_cluster
