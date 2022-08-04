@@ -1,4 +1,5 @@
 # Ansible_Role_for_setup_k8s_cluster
+OS: Ubuntu-20.04
 
 Step 1. Setup Ansible
 Step 2. Install Roles
