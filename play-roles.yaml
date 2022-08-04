@@ -1,0 +1,12 @@
+--- 
+- hosts: master
+  become: true
+  roles: 
+  - aryanraj750.k8s_master
+
+- hosts: worker
+  become: true
+  roles:
+  - aryanraj750.k8s_worker
+
+   

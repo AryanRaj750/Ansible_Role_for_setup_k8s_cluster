@@ -1,0 +1,58 @@
+---
+- name: "k8s multi-worker setup"
+  block:
+     - name: "add key to verify releases"
+       shell: "curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -"
+
+     - name: "setting repo for k8s"
+       copy:
+           src: "kubernetes.list"
+           dest: "/etc/apt/sources.list.d/"
+
+     - name: "update apt-get"
+       shell: "apt-get update && sudo apt-get upgrade -y"
+
+     - name: "install docker"
+       package:
+           name: docker.io
+           state: present
+
+     - name: "start docker service"
+       service:
+           name: docker
+           state: started
+           enabled: true
+
+     - name: "install kubelet package"
+       package:
+           name: "kubeadm"
+           state: present
+     - name: "start kubelet service"
+       service:
+           name: kubelet
+           state: started
+           enabled: true
+     - name: "setting driver as systemd"
+       copy:
+           src: "daemon.json"
+           dest: "/etc/docker/"
+       register: daemon
+     - name: "restart docker service"
+       service:
+          name: "docker"
+          state: restarted
+       #when: daemon.changed == true
+     - name: "install apt-transport-https package"
+       package:
+           name: "apt-transport-https"
+           state: present
+     - name: "enable kernel bridge setting"
+       copy:
+           src: "k8s.conf"
+           dest: "/etc/sysctl.d/"
+     - name: "join workner node to master node"
+       command: "{{ hostvars['Dummy_Host']['token'] }}"
+  rescue:
+     - name: "why failed, debuging..."
+       debug:
+           msg: "It looks like your workerNode is already joined. Make ensure by running command 'kubectl get nodes -o wide' on your masterNode"
